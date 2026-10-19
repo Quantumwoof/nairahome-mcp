@@ -11,6 +11,10 @@
 > "Alexa, plan my money home with 600 pounds."
 > "This month you have 5 items worth ₦795,000, about £462 at today's rate. It all fits in your £600 budget. That's 3 transfers: £90 to Dad, £87 to Mum, £285 to Ada. Heads up: Mum's house rent, ₦1.2 million, is due 5 January; set aside £233 a month."
 
+![NairaHome plan card on the simulated Alexa+ display, with live MCP traffic](docs/screenshot-plan.png)
+
+![True-cost card for a transfer quote](docs/screenshot-quote.png)
+
 ---
 
 ## Why
