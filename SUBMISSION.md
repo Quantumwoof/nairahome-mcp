@@ -17,13 +17,12 @@ An Alexa+ MCP server that remembers the family you support in Nigeria, shows wha
 - Repo (public, MIT): https://github.com/Quantumwoof/nairahome-mcp
 - Try it (simulated Alexa+ display): https://nairahome-mcp.vercel.app
 - MCP endpoint: https://nairahome-mcp.vercel.app/mcp (header `x-nairahome-household: <any 8-64 char id>`)
-- Demo video: **TODO: YouTube/Vimeo link, public, under 3 min**
+- Demo video (2:50): `<paste the public YouTube/Vimeo link after uploading demo.mp4>`
 
 ---
 
 ## Inspiration
-<!-- Joshua: personalise this with your own story before submitting. -->
-I'm a builder in Nigeria, and I've spent this year building remittance tools. The same picture keeps coming up from the receiving side: someone abroad keeping a household running from their phone. Mum's upkeep, a younger sibling's school fees, a parent's medication, the yearly rent that always seems to arrive as an emergency. It lives in WhatsApp threads and memory. And the apps that move the money often advertise "zero fees" while the real cost is hidden in the exchange rate. Nigeria is the largest remittance destination in sub-Saharan Africa, and sending money home still costs well above the UN's 3% target (SDG 10.c). These conversations happen out loud in the kitchen, so I wanted the household memory and the honest calculator to be there too, on Alexa+.
+I live in Nigeria, on the receiving end of the money that keeps a lot of households here running. Someone abroad covers Mum's upkeep, a younger sibling's school fees, a parent's medication, and the yearly rent that always seems to arrive as an emergency. All of it lives in WhatsApp threads and memory. The apps that move the money often say "zero fees" while the real cost sits in the exchange rate. Nigeria is the largest remittance destination in sub-Saharan Africa, and sending money there still costs well above the UN's 3% target (SDG 10.c). These conversations happen out loud at home, so I wanted the household memory and an honest cost calculator to live there too, on Alexa+.
 
 ## What it does
 NairaHome is an Alexa+ integration built as a self-hosted MCP server. It remembers the household (who you support and what they need: monthly upkeep, termly school fees, yearly rent, one-off repairs, essential or flexible) and turns it into three things:
@@ -51,6 +50,8 @@ On screens, each answer comes with a card (an MCP App) showing the plan, the cos
 - **State on serverless.** Stateless Streamable HTTP is perfect for serverless but needs durable storage for "remembers across sessions"; I added a pluggable store (Blob / file / memory).
 - **Honesty without provider APIs.** Live provider quotes aren't openly available, so NairaHome takes the rate the user reads off their app and prices it against the live mid-market rate, with a sanity check that catches a wrong currency.
 - **Voice numbers.** "₦1,234,567.00" is unspeakable; every amount has a spoken form.
+- **Tooling versions.** I had to read the SDK source (`LATEST_PROTOCOL_VERSION`) to confirm which version speaks 2025-11-25, and MCP Inspector v2 needs Node 22, which I ran through `npx -p node@22`.
+- **Cold starts.** While recording the demo, one request hit a dropped connection on a cold serverless start and the display showed an error. I added a single automatic retry for calls that are safe to repeat (never for logging a transfer or changing the household).
 
 ## Accomplishments that we're proud of
 - A planner that does real agentic work in one call: budget fitting, essentials-first triage, per-person grouping, set-asides, and a transfer-cost estimate it *learns* from your own history.
@@ -81,10 +82,13 @@ On screens, each answer comes with a card (an MCP App) showing the plan, the cos
 5. Locally: `npm install && npm start` (or `FX_MODE=demo npm start` offline), `npm test`.
 
 ## Built during the submission window?
-Yes. NairaHome was created from scratch during the hackathon (first commit 19 Oct 2026). It is a new codebase, not an update of my earlier remittance projects.
+Yes. NairaHome was created from scratch during the hackathon (first commit 19 Oct 2026). It is a new codebase, not an update of an existing project.
+
+## Demo video
+`demo.mp4` (1920×1080, 2:50, English). It's a scripted screen capture of the live site and a real MCP Inspector v2 run against the live endpoint, with text-to-speech narration and voices (no music). On-screen labels say what's real: the Alexa+ display is simulated, every answer is a real MCP call, and rates are live mid-market references, not demo rates. The sample family is demo data.
 
 ## Product feedback (required field)
-Paste and edit from `docs/FEEDBACK.md`: tools used and for what, what worked, what needs work, onboarding, would build again (yes, and why).
+Paste from `docs/FEEDBACK.md`: tools used and what for, what worked, what needs work, onboarding, and whether I'd build with it again.
 
 ## Feature requests (optional) and friction log (optional, up to 10% bonus)
 Paste from `docs/FEEDBACK.md`.

@@ -60,3 +60,9 @@ pre.small{background:#0a120d;border-radius:10px;padding:10px;overflow:auto;color
   .idle h1{font-size:26px}.idle{padding:24px}
   .speech{font-size:16px}
 }
+/* Short, wide screens (laptops, TVs, recordings): keep the display, answer and input in view without page scroll. */
+@media (min-width:981px) and (max-height:920px){
+  .screen{aspect-ratio:auto;height:max(300px,calc(100vh - 410px));min-height:0}
+  .layout{padding-top:16px}
+  .speech{margin-top:12px}
+}

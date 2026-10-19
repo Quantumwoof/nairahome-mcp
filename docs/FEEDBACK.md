@@ -1,6 +1,6 @@
 # Product feedback, feature requests and friction log
 
-> Draft for the Devpost "Product feedback" and "Friction log" fields. Joshua: edit into your own words and keep only what matches your experience.
+Written for the Devpost "Product feedback" and "Friction log" fields, from building NairaHome during the hackathon (Joshua Jubelo, @Quantumwoof).
 
 ## Tools, APIs and SDKs used
 
@@ -11,20 +11,21 @@
 | MCP Apps (`ui://` resource, `text/html;profile=mcp-app`) | The visual card for multimodal Alexa+ devices; the web simulator hosts it. |
 | MCP Inspector v2 (CLI) | Verifying the hosted endpoint as a standard MCP server. |
 | Web Speech API | Voice in/out in the simulated Alexa+ experience. |
+| edge-tts, Playwright, ffmpeg | Making the demo video: a scripted screen capture of the live site with synthetic narration. |
 | Vercel Functions + Vercel Blob (free tier) | Hosting the MCP endpoint and durable household storage. |
 | ExchangeRate-API open access | Live mid-market naira reference rate. |
 
 **What worked well**
 - The 2025-11-25 SDK made a spec-compliant server short. `registerTool` with zod input/output schemas gives validated `structuredContent` for free, which is exactly what a voice + screen client needs.
 - The Web-standard Streamable HTTP transport in stateless mode runs unchanged on serverless and on plain Node, which made "self-hosted" easy to satisfy and to test (the integration tests drive the real transport through `fetch`).
-- MCP being the open standard meant every MCP client (Inspector, IDE agents) could test the same endpoint Alexa+ would call.
+- MCP being the open standard meant every MCP client (I used MCP Inspector and the SDK's own client) could test the same endpoint Alexa+ would call.
 
 **What needs work**
 - There's no way for a non-Preview developer to point real Alexa+ at a self-hosted MCP server, so the end-to-end voice experience had to be simulated.
 - The Alexa+ docs available to hackathon entrants don't say how Alexa+ identifies the customer to an MCP server (account linking? OAuth 2.1 per the MCP auth spec? a per-user header?), so I had to design a stand-in.
 - It isn't clear which Alexa+ devices render MCP Apps / `ui://` resources, or which MCP Apps protocol version they expect.
 
-**Onboarding (zero to hello world):** about an hour from the MCP docs to a working tool, longer to confirm which SDK version actually speaks 2025-11-25 (I checked `LATEST_PROTOCOL_VERSION` in the SDK source).
+**Onboarding (zero to hello world):** getting a first tool answering over Streamable HTTP was quick with the TypeScript SDK. The slow part was confirming which SDK version actually speaks 2025-11-25: I had to check `LATEST_PROTOCOL_VERSION` in the SDK source.
 
 **Would I build with it again?** Yes. Voice is the natural interface for this household-money job, and MCP means the same server also serves any agent the user already has.
 
@@ -45,4 +46,4 @@
 | 3 | Confirm SDK support for spec 2025-11-25 | Checked the npm package, then read the SDK's `types.js` | A version table per SDK language on the hackathon resources page | Had to read source to confirm `LATEST_PROTOCOL_VERSION = '2025-11-25'` | Medium | Pinned `@modelcontextprotocol/sdk@1.32.1` | Add "minimum SDK versions for 2025-11-25" to the Alexa+ track resources |
 | 4 | Show a visual card on a smart display | Implemented an MCP App `ui://` resource | Guidance on whether Alexa+ renders MCP Apps and how | No device guidance | Medium | Simulator acts as the MCP Apps host | Document MCP Apps support per device |
 | 5 | Validate with MCP Inspector | `npx @modelcontextprotocol/inspector --cli …` | Works on Node 20 | npx picked a cached v1 that rejects URL targets; v2 needs Node 22+ | Low | `npx -p node@22 -p @modelcontextprotocol/inspector …` | Mention the Node 22 requirement in the getting-started guide |
-| 6 | Use AWS for hosting | Read the AWS credit section of the rules | Request credits | Credit codes ran out on Oct 7 | Low | Free hosting elsewhere | Note remaining free-tier paths for late joiners |
+| 6 | Use AWS for hosting | Read the AWS credit section of the rules | Request credits | The rules say credit codes ran out on Oct 7 | Low | Free-tier hosting on Vercel | Note remaining free-tier paths for late joiners |

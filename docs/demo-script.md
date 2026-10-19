@@ -14,3 +14,6 @@ Record at 1080p in Chrome (voice input needs Chrome or Edge) on https://nairahom
 | 2:25-2:40 | Terminal: run the MCP Inspector one-liner from the README against the live endpoint | "And it's a standard MCP server: here's the official MCP Inspector calling the same endpoint. Code, tests and setup are on GitHub, MIT licensed." |
 
 Tips: keep each spoken request short; if a recognition misfires, type it instead (the typed path calls the same tools). Don't show the household id for long, and don't show any real account details.
+
+## Recorded demo
+The submitted video (2:50) follows this script. It was made on a Linux box: Playwright drives Chrome on Xvfb against the live site, ffmpeg records the screen, edge-tts provides the narration and voices, and the MCP Inspector beat is a real run in a terminal. Every answer on screen came from the live endpoint.

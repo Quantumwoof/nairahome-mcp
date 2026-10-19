@@ -46,7 +46,18 @@ async function rpc(method, params, { notify = false } = {}) {
   const headers = { "content-type": "application/json", accept: "application/json, text/event-stream", "x-nairahome-household": household };
   if (negotiated) headers["mcp-protocol-version"] = negotiated;
   logLine("→", method, params ?? {});
-  const res = await fetch(ENDPOINT, { method: "POST", headers, body: JSON.stringify(msg) });
+  const init = { method: "POST", headers, body: JSON.stringify(msg) };
+  let res;
+  try {
+    res = await fetch(ENDPOINT, init);
+  } catch (e) {
+    // One retry on a dropped connection (e.g. cold start), but only for calls that are safe to repeat.
+    const mutating = method === "tools/call" && /^(log_transfer|add_|remove_|reset_|set_)/.test(params?.name ?? "");
+    if (mutating) throw e;
+    logLine("!", `${method} network error, retrying once`, String(e.message || e));
+    await new Promise((r) => setTimeout(r, 600));
+    res = await fetch(ENDPOINT, init);
+  }
   if (notify) return null;
   const body = await readRpc(res);
   if (!body) throw new Error(`HTTP ${res.status}`);
