@@ -1,0 +1,28 @@
+{
+  "name": "nairahome-mcp",
+  "version": "1.0.0",
+  "description": "NairaHome: an Alexa+ MCP server (spec 2025-11-25, Streamable HTTP) that helps the Nigerian diaspora plan, price and track the money they send home.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Joshua Jubelo <caughtsight007@gmail.com>",
+  "repository": "github:Quantumwoof/nairahome-mcp",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx scripts/smoke.ts",
+    "inspector": "npx @modelcontextprotocol/inspector"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@vercel/blob": "^2.8.2",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.0"
+  }
+}

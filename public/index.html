@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NairaHome · Alexa+ money-home agent (MCP)</title>
+<meta name="description" content="NairaHome is an Alexa+ MCP server that remembers the family you support in Nigeria, prices every transfer against the live naira rate, and plans each month's money home.">
+<meta property="og:title" content="NairaHome · money home, by voice">
+<meta property="og:description" content="An Alexa+ MCP server (spec 2025-11-25, Streamable HTTP) for the Nigerian diaspora: plan, price and track the money you send home.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="favicon.svg" alt="" width="34" height="34"><div><b>NairaHome</b><span>money home, by voice</span></div></div>
+  <div class="status" id="status"><i class="dot"></i><span>Connecting to MCP server…</span></div>
+</header>
+
+<main class="layout">
+  <section class="device-col">
+    <div class="sim-label">Simulated Alexa+ on a smart display · <a href="#how">what's real?</a></div>
+    <div class="device">
+      <div class="screen">
+        <iframe id="card" title="NairaHome MCP App card" sandbox="allow-scripts"></iframe>
+        <div class="idle" id="idle">
+          <h1>Who are you sending money home to this month?</h1>
+          <p>Try a chip below, or press the mic and talk.</p>
+        </div>
+      </div>
+      <div class="bezel"><div class="ring" id="ring"></div></div>
+    </div>
+
+    <div class="speech" id="speech" aria-live="polite"></div>
+
+    <form class="ask" id="ask" autocomplete="off">
+      <button type="button" class="mic" id="mic" title="Speak (Chrome / Edge)" aria-label="Speak">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2Z"/></svg>
+      </button>
+      <input id="utter" placeholder="“Alexa, plan my money home with 600 pounds”" aria-label="What would you like to ask?">
+      <button class="send" type="submit">Ask</button>
+    </form>
+    <div class="chips" id="chips"></div>
+    <label class="voice"><input type="checkbox" id="speak" checked> Read answers aloud</label>
+  </section>
+
+  <aside class="side">
+    <details open class="panel">
+      <summary>Under the hood: live MCP traffic</summary>
+      <div class="meta" id="meta"></div>
+      <ol class="log" id="log"></ol>
+    </details>
+
+    <details class="panel">
+      <summary>Household (remembered by the MCP server)</summary>
+      <p class="small">Your household id lives in this browser. The server keeps the family, obligations, transfers and alerts between sessions.</p>
+      <div class="hh"><code id="hhid"></code><button type="button" id="newhh" class="ghost">New household</button></div>
+      <form id="addMember" class="mini">
+        <b>Add someone you support</b>
+        <input name="name" placeholder="Name, e.g. Tunde" required maxlength="40">
+        <input name="relationship" placeholder="Relationship, e.g. brother" required maxlength="60">
+        <input name="payout_note" placeholder="Payout hint, e.g. OPay wallet (no account numbers)" maxlength="60">
+        <button class="ghost">Add person</button>
+      </form>
+      <form id="addObligation" class="mini">
+        <b>Add something to cover</b>
+        <input name="member_name" placeholder="Who, e.g. Tunde" required>
+        <input name="label" placeholder="What, e.g. transport" required maxlength="60">
+        <input name="amount_ngn" type="number" min="1" step="1" placeholder="Amount in naira" required>
+        <div class="two">
+          <select name="recurrence"><option>monthly</option><option>termly</option><option>yearly</option><option>once</option></select>
+          <select name="priority"><option>essential</option><option>flexible</option></select>
+        </div>
+        <input name="next_due" type="date" required>
+        <button class="ghost">Save</button>
+      </form>
+    </details>
+
+    <details class="panel" id="how">
+      <summary>What's real, and how to connect your own MCP client</summary>
+      <ul class="small">
+        <li><b>Real:</b> every answer is a <code>tools/call</code> to the NairaHome MCP server (spec <code>2025-11-25</code>, Streamable HTTP) shown in the log above. The naira rate is the live mid-market reference from ExchangeRate-API, with its timestamp.</li>
+        <li><b>Real:</b> the card on the display is the server's MCP App (<code>ui://nairahome/card.html</code>), fetched with <code>resources/read</code> and hosted here the way a multimodal device would host it.</li>
+        <li><b>Simulated:</b> Alexa+'s language model. A small rule-based intent router in <code>public/app.js</code> picks the tool and fills arguments. It is deliberately simple; in Alexa+, the model reads the tool descriptions and does this.</li>
+        <li><b>Never invented:</b> provider rates. You tell NairaHome what your app offers; it prices that against the live rate. NairaHome never moves money.</li>
+        <li><b>Sample data:</b> “load the sample family” fills a clearly labelled demo household.</li>
+      </ul>
+      <p class="small">MCP endpoint: <code id="endpoint"></code></p>
+      <pre class="small">npx @modelcontextprotocol/inspector
+# Transport: Streamable HTTP · URL: the endpoint above
+# Header: x-nairahome-household: &lt;any 8-64 char id&gt;</pre>
+      <p class="small"><a href="https://github.com/Quantumwoof/nairahome-mcp">Source on GitHub</a> · MIT licence</p>
+    </details>
+  </aside>
+</main>
+<footer class="foot">NairaHome is a planning and price-checking tool. It does not hold or move money. Rates: <a href="https://www.exchangerate-api.com">Rates By Exchange Rate API</a>.</footer>
+<script src="app.js" type="module"></script>
+</body>
+</html>
