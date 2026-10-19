@@ -43,7 +43,7 @@ On screens, each answer comes with a card (an MCP App) showing the plan, the cos
 - **Live data:** mid-market rates from ExchangeRate-API's open endpoint, cached for 30 minutes, with source and timestamp in every answer. If it's down, NairaHome says so instead of guessing. A labelled `FX_MODE=demo` exists for offline work.
 - **Durable household memory:** private Vercel Blob objects on the hosted demo, JSON files when self-hosted; households keyed by a header (optional bearer token and Origin allow-list for self-hosters).
 - **Simulated Alexa+ display** (the rules' simulated-experience path, since Alexa+ MCP is in brand Preview): a web app with voice in/out (Web Speech API) that speaks MCP over HTTP itself, shows the live JSON-RPC traffic, and hosts the server's MCP App card. A small rule-based intent router with multi-turn slot filling stands in for Alexa+'s language model; every number comes from the real server.
-- **Quality:** 19 automated tests (quote maths, planner, recurrence, intent router, and a full MCP client ↔ server flow across sessions), a smoke script that drives the hosted endpoint with the official MCP client, and verification with MCP Inspector v2.
+- **Quality:** 20 automated tests (quote maths, planner, recurrence, intent router, and a full MCP client ↔ server flow across sessions), a smoke script that drives the hosted endpoint with the official MCP client, and verification with MCP Inspector v2.
 
 ## Challenges we ran into
 - **No self-serve Alexa+ MCP testing.** I couldn't attach my server to a real Alexa+ account, so I built a faithful simulator: it speaks the real protocol, hosts the real MCP App, and is honest about which part is simulated.

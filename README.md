@@ -106,7 +106,7 @@ git clone https://github.com/Quantumwoof/nairahome-mcp && cd nairahome-mcp
 npm install
 npm start                 # http://127.0.0.1:8787  (simulator) and /mcp (MCP endpoint)
 FX_MODE=demo npm start    # offline, labelled demo rates
-npm test                  # 19 tests: maths, planner, router, full MCP client/server flow
+npm test                  # 20 tests: maths, planner, router, full MCP client/server flow
 npm run typecheck
 npm run smoke -- https://nairahome-mcp.vercel.app/mcp   # end-to-end with the official MCP client
 ```

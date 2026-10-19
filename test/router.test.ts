@@ -10,6 +10,12 @@ test("parses a spoken transfer quote", () => {
   assert.deepEqual(parseMoney("I'm sending £300 at 1,960 with a £2 fee on Lemfi"), {
     currency: "GBP", fee: 2, offered_rate: 1960, send_amount: 300, provider: "Lemfi",
   });
+  assert.deepEqual(parseMoney("I'm sending 285 pounds to Ada at 1745 with a £1.99 fee on Lemfi"), {
+    currency: "GBP", fee: 1.99, offered_rate: 1745, send_amount: 285, provider: "Lemfi",
+  });
+  assert.deepEqual(parseMoney("fee of £2.50, sending £120 at 1700"), { currency: "GBP", fee: 2.5, offered_rate: 1700, send_amount: 120 });
+  assert.equal(parseMoney("with a £1.99 fee, sending 300 pounds at 1745").send_amount, 300);
+  assert.equal(parseMoney("Is 1745 a good rate for £300.").send_amount, 300);
   assert.deepEqual(parseMoney("sending 250 dollars at 1480 no fee"), { currency: "USD", fee: 0, offered_rate: 1480, send_amount: 250 });
 });
 
@@ -37,6 +43,12 @@ test("compare two offers", () => {
   assert.equal(r.tool, "compare_quotes");
   assert.equal(r.args.send_amount, 400);
   assert.deepEqual(r.args.quotes.map((q: any) => [q.provider, q.offered_rate, q.fee]), [["Wise", 1975, 0.9], ["Lemfi", 1960, 0]]);
+});
+
+test("compare with lowercase names, and 'how much have I sent' is a summary", () => {
+  const r = route("compare lemfi 1740 and wise 1765 fee 3.4 for 300 pounds");
+  assert.deepEqual(r.args.quotes.map((q: any) => [q.provider, q.offered_rate, q.fee]), [["Lemfi", 1740, 0], ["Wise", 1765, 3.4]]);
+  assert.equal(route("Alexa, how much have I sent this year", { members }).tool, "household_summary");
 });
 
 test("adds an obligation from speech", () => {

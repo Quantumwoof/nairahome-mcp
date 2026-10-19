@@ -48,10 +48,20 @@ export function parseMoney(raw) {
     l.match(new RegExp(`${NUM}\\s*(?:naira|ngn)\\s*(?:per|to the|a|for (?:one|1|a|each))`));
   if (m) out.offered_rate = Number(m[1]);
 
-  m = l.match(new RegExp(`(?:[£$€]|c\\$)\\s*${NUM}`)) ||
-    l.match(new RegExp(`${NUM}\\s*(?:canadian dollars?|pounds?|quid|dollars?|bucks|euros?|gbp|usd|eur|cad)\\b(?!\\s*(?:fee|fees|charge))`));
-  if (m && Number(m[1]) !== out.fee) out.send_amount = Number(m[1]);
-  else if (m && out.fee === undefined) out.send_amount = Number(m[1]);
+  // Sender amount: the first "£300" / "300 pounds" that isn't the fee.
+  const cands = [];
+  for (const re of [
+    new RegExp(`(?:[£$€]|c\\$)\\s*${NUM}(?!\\d|\\.\\d)(?!\\s*(?:pounds?|dollars?|euros?|gbp|usd|eur|cad)?\\s*(?:fee|fees|charge))`, "g"),
+    new RegExp(`(?<!\\d|\\d\\.)${NUM}\\s*(?:canadian dollars?|pounds?|quid|dollars?|bucks|euros?|gbp|usd|eur|cad)\\b(?!\\s*(?:fee|fees|charge))`, "g"),
+  ]) {
+    for (const x of l.matchAll(re)) {
+      const before = l.slice(Math.max(0, x.index - 12), x.index);
+      if (/(fee|fees|charge)\s*(is|of|:)?\s*$/.test(before)) continue;
+      cands.push({ at: x.index, n: Number(x[1]) });
+    }
+  }
+  cands.sort((a, b) => a.at - b.at);
+  if (cands.length) out.send_amount = cands[0].n;
 
   // A bare number that's plainly a naira rate (e.g. "1960") when nothing else claimed it.
   if (out.offered_rate === undefined) {
@@ -102,8 +112,8 @@ function findMember(text, members) {
 }
 
 export const HELP =
-  "You can say: plan my month with 600 pounds; what's the pound to naira; I'm sending 300 pounds at 1960 with a 2 pound fee on Lemfi; " +
-  "compare Wise at 1975 fee 0.9 and Lemfi at 1960 no fee; I sent it to Mum; tell me when the pound hits 2000 naira; or load the sample family.";
+  "You can say: plan my month with 600 pounds; what's the pound to naira; I'm sending 300 pounds to Mum, then tell me your app's rate and fee; " +
+  "compare two apps' rates; I've sent it to Mum; tell me when the pound hits a target rate; or load the sample family.";
 
 /**
  * @param {string} utterance
@@ -144,10 +154,15 @@ export function route(utterance, ctx = {}) {
     const parts = raw.replace(/^.*?\b(compare|which is (better|cheaper))\b:?/i, "").split(/,|;|\bvs\.?\b|\bversus\b|\band\b/i);
     const quotes = [];
     for (const p of parts) {
-      const name = p.match(/([A-Z][\w.&-]*(?:\s+[A-Z][\w.&-]*)?)/);
+      const name =
+        p.match(/([A-Z][\w.&-]*(?:\s+[A-Z][\w.&-]*)?)\s+(?:at|is|offers?|gives?|pays?)?\s*(?:₦\s*)?\d/) ||
+        p.match(/\b(?!(?:at|is|for|fee|fees|with|no|and|offers?|gives?|pays?)\b)([a-z][\w.&-]*)\s+(?:at\s+|is\s+|offers?\s+|gives?\s+|pays?\s+)?(?:₦\s*)?\d/i);
       const pm = parseMoney(p);
       const rate = pm.offered_rate ?? [...normalise(p).matchAll(/\d+(?:\.\d+)?/g)].map((x) => Number(x[0])).find((n) => n >= 500);
-      if (name && rate) quotes.push({ provider: name[1].trim(), offered_rate: rate, fee: pm.fee ?? 0 });
+      if (name && rate) {
+        const prov = name[1].trim();
+        quotes.push({ provider: prov[0].toUpperCase() + prov.slice(1), offered_rate: rate, fee: pm.fee ?? 0 });
+      }
     }
     if (quotes.length < 2) return { ask: "Tell me two offers, like: Wise at 1975 fee 0.9, and Lemfi at 1960 with no fee." };
     if (!amount) return { ask: "How much are you sending?", pending: { intent: "compare", args: { quotes } } };
@@ -155,6 +170,8 @@ export function route(utterance, ctx = {}) {
     if (detectCurrency(t)) args.currency = detectCurrency(t);
     return { tool: "compare_quotes", args };
   }
+
+  if (/\bhow much (have|did) i (send|sent)\b|\bsent so far\b/.test(l)) return { tool: "household_summary", args: {} };
 
   if (/\b(i('ve| have)?\s*(just\s+)?sent|i just sent|log (it|that|a transfer)|record (it|that|a transfer)|done,? sent)\b/.test(l)) {
     const pm = parseMoney(raw);

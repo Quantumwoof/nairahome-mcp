@@ -47,8 +47,8 @@ export const CARD_HTML = /* html */ `<!doctype html>
       h+=fxLine(d.fx);}
     else if(sc.kind==='summary'){var c2=d.currency;h='<div class="eyebrow">Your household'+(d.sample?' · <span class="pill demo">SAMPLE FAMILY</span>':'')+'</div><div class="grid"><div class="tile"><div class="muted">Sent this month</div><div class="v">'+N(d.thisMonth.ngn)+'</div></div><div class="tile"><div class="muted">Lost to fees + markup</div><div class="v">'+M(d.thisMonth.cost,c2)+'</div></div><div class="tile"><div class="muted">This year</div><div class="v">'+N(d.thisYear.ngn)+'</div></div></div>';
       (d.upcoming||[]).forEach(function(o){h+='<div class="row"><span><b>'+esc(o.member)+'</b> · '+esc(o.label)+(o.overdue?' <span class="pill bad">overdue</span>':'')+'</span><span>'+N(o.amountNgn)+' <span class="muted">'+D(o.nextDue)+'</span></span></div>'});}
-    else {h='<p class="say">'+esc(sc.speech)+'</p>';}
-    if(sc.kind!=='rate'&&sc.kind!=='other') h+='<p class="muted" style="margin-top:14px">\\u201c'+esc(sc.speech)+'\\u201d</p>';
+    else {h='<p class="say">'+esc(sc.speech)+'</p>';sc={kind:'rate'};}
+    if(sc.kind!=='rate') h+='<p class="muted" style="margin-top:14px">\\u201c'+esc(sc.speech)+'\\u201d</p>';
     root.innerHTML=h;
     post({jsonrpc:'2.0',method:'ui/notifications/size-changed',params:{height:document.documentElement.scrollHeight}});
   }

@@ -482,6 +482,7 @@ export function createNairaHomeServer(deps: ServerDeps): McpServer {
         speech += month.count
           ? ` This month you've sent ${sayNgn(month.ngn)} in ${month.count} transfer${month.count > 1 ? "s" : ""}, and ${sayMoney(month.cost, cur)} went on fees and markups.`
           : " You haven't logged a transfer this month.";
+        if (year.count > month.count) speech += ` This year: ${sayNgn(year.ngn)} across ${year.count} transfers.`;
       }
       return ok({
         speech,
